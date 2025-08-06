@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iPad EULA Acceptance</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,6 +27,9 @@
             width: 100%;
             padding: 8px;
             margin-top: 5px;
+            font-family: monospace;
+            font-size: 16px;
+            letter-spacing: 1px;
         }
         button {
             background-color: #4CAF50;
@@ -34,9 +38,33 @@
             border: none;
             cursor: pointer;
             font-size: 16px;
+            margin-right: 10px;
+            position: relative;
+            min-width: 120px;
         }
         button:hover {
             background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .button-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .button-text {
+            display: inline-block;
         }
         .message {
             padding: 15px;
@@ -59,56 +87,211 @@
             color: #a94442;
             border: 1px solid #ebccd1;
         }
+        .screenshot-area {
+            background: white;
+            padding: 20px;
+            border: 2px solid #333;
+            margin-bottom: 20px;
+        }
+        .screenshot-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .screenshot-student-info {
+            background: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .screenshot-eula {
+            border: 1px solid #ccc;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .screenshot-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            color: #666;
+        }
+        .input-error {
+            border: 2px solid #f44336;
+            background-color: #ffebee;
+        }
+        .input-valid {
+            border: 2px solid #4CAF50;
+            background-color: #f1f8e9;
+        }
+        .format-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
-    <h1>iPad EULA Acceptance</h1>
-    <div class="eula-container">
-        <h2>End User License Agreement</h2>
-        <p>By accepting this agreement, you acknowledge and agree to the following terms and conditions regarding the use of your school-issued iPad:</p>
+    <h1>iPad AUP Acceptance</h1>
+    
+    <!-- Screenshot area that will be captured -->
+    <div id="screenshotArea" class="screenshot-area" style="display: none;">
+        <div class="screenshot-header">
+            <h2>End User License Agreement - Acceptance Record</h2>
+            <p>Date: <span id="currentDate"></span></p>
+        </div>
         
-        <h3>1. Device Usage</h3>
-        <p>The iPad is provided for educational purposes only. You agree to use the device in accordance with school policies and for academic-related activities.</p>
+        <div class="screenshot-student-info">
+            <strong>Student Number:</strong> <span id="screenshotStudentNumber"></span>
+        </div>
+        
+        <div class="screenshot-eula">
+            <h3>PURPOSE</h3>
+            <p>The purpose of issued technology items and access for students is to facilitate education and research, to promote access to electronic resources that will assist in providing information to learners, and to assist staff in carrying out their responsibilities as educators.</p>
+            
+            <h4>STUDENT USE</h4>
+            <ul>
+                <li>Learners are responsible for their issued technology items and must take good care of them.</li>
+                <li>Learners must ensure that their applicable technology devices (tablet, Chromebook, iPad, laptop, hotspot, etc.) are charged every day before they bring them to school.</li>
+                <li>Learners must bring their issued device(s) to school every day that they are in attendance.</li>
+                <li>Sound must be muted unless headphones are used, or permission is obtained from the teacher.</li>
+                <li>Learners must know where their issued device(s) is at all times and only use the device(s) provided to them unless otherwise permitted by a teacher.</li>
+            </ul>
 
-        <h3>2. Device Care</h3>
-        <p>You are responsible for the proper care and maintenance of the iPad. This includes:</p>
+            <h4>BASIC CARE AND HANDLING</h4>
+            <ul>
+                <li>Learners will not loan out their Chromebook, iPad, or other issued technology device(s), cords, or accessories to others.</li>
+                <li>Learners must keep their issued technology device(s) protected at all times.</li>
+                <li>Learners must keep food and liquids away from their issued technology device(s).</li>
+                <li>Learners must use their issued technology device(s) responsibly when on the bus.</li>
+                <li>Learners must not deface their issued technology device(s) in any way. This includes, but is not limited to, marking, painting, drawing, attaching stickers, etc.</li>
+                <li>Learners must not tamper with the hardware or software, disassemble any part of, or attempt any repairs of their issued technology device(s).</li>
+            </ul>
+
+            <h4>STUDENT EXPECTATIONS FOR RESPONSIBLE COMPUTING</h4>
+            <ul>
+                <li>Learners must keep their login and password information private and only share it with teachers, school officials, and parents/guardians.</li>
+                <li>Learners must only use the login and password information provided to them and must not attempt to login as any other person.</li>
+                <li>Learners must use appropriate language in all digital products and communications.</li>
+                <li>Learners must not give their name, address, phone number, school, or my teachers'/parents' names, addresses, or phone numbers to anyone online.</li>
+                <li>Learners must not fill out any form or sign up for anything online that asks them for any information about their school, family, or themselves without first asking permission from their teachers/parents/guardians.</li>
+                <li>Learners must not use any articles, stories, or other works they find online and pretend it is their own.</li>
+                <li>Learners must not make use of materials or attempt to locate materials that are inappropriate in a school setting, or that may offend others.</li>
+                <li>Learners must only locate and use school appropriate content in their digital work.</li>
+                <li>Learners must not use screensavers, backgrounds, and/or pictures with offensive language and/or materials.</li>
+                <li>Learners' issued technology devices are subject to inspection at any time without notice and remain the property of the Kansas City Public Schools.</li>
+                <li>Learners must follow the expectations outlined in board policies, associated board regulations, Learner/Parent Technology Handbook, and the Learner Code of Student Conduct at all times. A copy of this policy and regulation can be found online at www.kcpublicschools.org.</li>
+                <li>Learners must return their issued technology device(s) and all accessories in good working condition.</li>
+                <li>Learners will be charged for any lost/stolen/damaged laptop items.</li>
+            </ul>
+
+            <h4>PARENT/GUARDIAN RESPONSIBILITIES AND INFORMATION</h4>
+            <ul>
+                <li>Parents/Guardians are responsible for any damages to their learner's issued technology device(s).</li>
+                <li>Incidents which occur at school involving multiple parties will be investigated by district administration.</li>
+                <li>Parents/Guardians and learners are to follow the expectations outlined in the Board Policies, and associated board regulations. A violation of these guidelines could result in disciplinary action for the learner.</li>
+                <li>Parents/Guardians are responsible for monitoring their learner's use of all district issued technology and Internet use when they are not at school.</li>
+                <li>A learner's use of the school network and device will be monitored for compliance with school policies and applicable laws.</li>
+                <li>Fraudulent reporting of theft will be turned over to the police.</li>
+            </ul>
+            
+            <p>• Learners will have access to web-based tools, digital resources, and applications that support teaching and learning, and these online services may collect, use, and disclose personal information (such as learner names and email addresses), but only for the use and benefit of the school for the purpose of learner learning. In accordance with Board policies and regulations, learners will be strongly discouraged from providing any other personal information, and parents/guardians must instruct their learner not to provide any other personal information. Parents/guardians must contact their learner's teacher and/or school if they need additional information about the applications and online services that are used for learning in their learner's classes.</p>
+            
+            <p>The district's technology resources are not a public forum for expression of any kind.</p>
+            
+            <h4>RIGHT TO MONITOR STUDENT USE</h4>
+            <p>The district reserves the right to:</p>
+            <ol>
+                <li>monitor all learner computer activity at any time;</li>
+                <li>determine what is appropriate use;</li>
+                <li>log network use and monitor storage space utilized by users; and</li>
+                <li>remove a user's access to the network at any time it is determined that the user engaged in unauthorized activity or unacceptable use.</li>
+            </ol>
+        </div>
+        
+        <div class="screenshot-footer">
+            <p>This document serves as proof of EULA acceptance for the above student number.</p>
+        </div>
+    </div>
+
+    <div class="eula-container">
+        <h2>PURPOSE</h2>
+        <p>The purpose of issued technology items and access for students is to facilitate education and research, to promote access to electronic resources that will assist in providing information to learners, and to assist staff in carrying out their responsibilities as educators.</p>
+        
+        <h3>STUDENT USE</h3>
         <ul>
-            <li>Keeping the device in its protective case at all times</li>
-            <li>Not exposing the device to extreme temperatures or moisture</li>
-            <li>Reporting any damage or issues immediately to school staff</li>
+            <li>Learners are responsible for their issued technology items and must take good care of them.</li>
+            <li>Learners must ensure that their applicable technology devices (tablet, Chromebook, iPad, laptop, hotspot, etc.) are charged every day before they bring them to school.</li>
+            <li>Learners must bring their issued device(s) to school every day that they are in attendance.</li>
+            <li>Sound must be muted unless headphones are used, or permission is obtained from the teacher.</li>
+            <li>Learners must know where their issued device(s) is at all times and only use the device(s) provided to them unless otherwise permitted by a teacher.</li>
         </ul>
 
-        <h3>3. Security and Privacy</h3>
-        <p>You agree to:</p>
+        <h3>BASIC CARE AND HANDLING</h3>
         <ul>
-            <li>Keep your login credentials secure</li>
-            <li>Not share your device with others</li>
-            <li>Report any security concerns immediately</li>
+            <li>Learners will not loan out their Chromebook, iPad, or other issued technology device(s), cords, or accessories to others.</li>
+            <li>Learners must keep their issued technology device(s) protected at all times.</li>
+            <li>Learners must keep food and liquids away from their issued technology device(s).</li>
+            <li>Learners must use their issued technology device(s) responsibly when on the bus.</li>
+            <li>Learners must not deface their issued technology device(s) in any way. This includes, but is not limited to, marking, painting, drawing, attaching stickers, etc.</li>
+            <li>Learners must not tamper with the hardware or software, disassemble any part of, or attempt any repairs of their issued technology device(s).</li>
         </ul>
 
-        <h3>4. Acceptable Use</h3>
-        <p>The iPad must be used in accordance with the school's acceptable use policy. Prohibited activities include:</p>
+        <h3>STUDENT EXPECTATIONS FOR RESPONSIBLE COMPUTING</h3>
         <ul>
-            <li>Accessing inappropriate content</li>
-            <li>Installing unauthorized applications</li>
-            <li>Modifying device settings without permission</li>
+            <li>Learners must keep their login and password information private and only share it with teachers, school officials, and parents/guardians.</li>
+            <li>Learners must only use the login and password information provided to them and must not attempt to login as any other person.</li>
+            <li>Learners must use appropriate language in all digital products and communications.</li>
+            <li>Learners must not give their name, address, phone number, school, or my teachers'/parents' names, addresses, or phone numbers to anyone online.</li>
+            <li>Learners must not fill out any form or sign up for anything online that asks them for any information about their school, family, or themselves without first asking permission from their teachers/parents/guardians.</li>
+            <li>Learners must not use any articles, stories, or other works they find online and pretend it is their own.</li>
+            <li>Learners must not make use of materials or attempt to locate materials that are inappropriate in a school setting, or that may offend others.</li>
+            <li>Learners must only locate and use school appropriate content in their digital work.</li>
+            <li>Learners must not use screensavers, backgrounds, and/or pictures with offensive language and/or materials.</li>
+            <li>Learners' issued technology devices are subject to inspection at any time without notice and remain the property of the Kansas City Public Schools.</li>
+            <li>Learners must follow the expectations outlined in board policies, associated board regulations, Learner/Parent Technology Handbook, and the Learner Code of Student Conduct at all times. A copy of this policy and regulation can be found online at www.kcpublicschools.org.</li>
+            <li>Learners must return their issued technology device(s) and all accessories in good working condition.</li>
+            <li>Learners will be charged for any lost/stolen/damaged laptop items.</li>
         </ul>
 
-        <h3>5. Consequences of Violation</h3>
-        <p>Violation of this agreement may result in:</p>
+        <h3>PARENT/GUARDIAN RESPONSIBILITIES AND INFORMATION</h3>
         <ul>
-            <li>Loss of device privileges</li>
-            <li>Disciplinary action</li>
-            <li>Financial responsibility for damages</li>
+            <li>Parents/Guardians are responsible for any damages to their learner's issued technology device(s).</li>
+            <li>Incidents which occur at school involving multiple parties will be investigated by district administration.</li>
+            <li>Parents/Guardians and learners are to follow the expectations outlined in the Board Policies, and associated board regulations. A violation of these guidelines could result in disciplinary action for the learner.</li>
+            <li>Parents/Guardians are responsible for monitoring their learner's use of all district issued technology and Internet use when they are not at school.</li>
+            <li>A learner's use of the school network and device will be monitored for compliance with school policies and applicable laws.</li>
+            <li>Fraudulent reporting of theft will be turned over to the police.</li>
         </ul>
+        
+        <p>• Learners will have access to web-based tools, digital resources, and applications that support teaching and learning, and these online services may collect, use, and disclose personal information (such as learner names and email addresses), but only for the use and benefit of the school for the purpose of learner learning. In accordance with Board policies and regulations, learners will be strongly discouraged from providing any other personal information, and parents/guardians must instruct their learner not to provide any other personal information. Parents/guardians must contact their learner's teacher and/or school if they need additional information about the applications and online services that are used for learning in their learner's classes.</p>
+        
+        <p>The district's technology resources are not a public forum for expression of any kind.</p>
+        
+        <h3>RIGHT TO MONITOR STUDENT USE</h3>
+        <p>The district reserves the right to:</p>
+        <ol>
+            <li>Monitor all learner computer activity at any time;</li>
+            <li>Determine what is appropriate use;</li>
+            <li>Log network use and monitor storage space utilized by users; and</li>
+            <li>Remove a user's access to the network at any time it is determined that the user engaged in unauthorized activity or unacceptable use.</li>
+        </ol>
     </div>
 
     <form id="eulaForm">
         <div class="form-group">
             <label for="studentNumber">Student Number:</label>
-            <input type="text" id="studentNumber" name="studentNumber" required>
+            <input type="text" id="studentNumber" name="studentNumber" required placeholder="S1234567" maxlength="8">
+            <div class="format-hint">Format: S####### (S followed by 7 digits)</div>
         </div>
-        <button type="submit">Accept EULA</button>
+        <button type="submit" id="submitButton">
+            <div class="button-spinner" id="buttonSpinner"></div>
+            <span class="button-text" id="buttonText">Accept EULA</span>
+        </button>
     </form>
 
     <div id="message" class="message"></div>
@@ -126,11 +309,334 @@
             }, 3000);
         }
 
+        function validateStudentNumber(studentNumber) {
+            // Check if it matches the pattern S####### (S followed by 7 digits)
+            const pattern = /^S\d{7}$/;
+            return pattern.test(studentNumber);
+        }
+
+        function formatStudentNumber(input) {
+            let value = input.value.toUpperCase();
+            
+            // Remove any non-alphanumeric characters
+            value = value.replace(/[^A-Z0-9]/g, '');
+            
+            // Ensure it starts with S
+            if (value.length > 0 && value[0] !== 'S') {
+                value = 'S' + value;
+            }
+            
+            // Limit to 8 characters (S + 7 digits)
+            value = value.substring(0, 8);
+            
+            input.value = value;
+            return value;
+        }
+
+        function updateInputValidation(input) {
+            const value = input.value;
+            const isValid = validateStudentNumber(value);
+            
+            // Remove existing validation classes
+            input.classList.remove('input-error', 'input-valid');
+            
+            if (value.length === 0) {
+                // No validation styling for empty input
+                return false;
+            } else if (isValid) {
+                input.classList.add('input-valid');
+                return true;
+            } else {
+                input.classList.add('input-error');
+                return false;
+            }
+        }
+
+        // Add event listeners for real-time validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const studentNumberInput = document.getElementById('studentNumber');
+            
+            // Format and validate on input
+            studentNumberInput.addEventListener('input', function() {
+                formatStudentNumber(this);
+                updateInputValidation(this);
+            });
+            
+            // Validate on blur
+            studentNumberInput.addEventListener('blur', function() {
+                updateInputValidation(this);
+            });
+            
+            // Validate on focus
+            studentNumberInput.addEventListener('focus', function() {
+                updateInputValidation(this);
+            });
+        });
+
+        function setButtonState(loading, text) {
+            const button = document.getElementById('submitButton');
+            const spinner = document.getElementById('buttonSpinner');
+            const buttonText = document.getElementById('buttonText');
+            
+            if (loading) {
+                button.disabled = true;
+                spinner.style.display = 'inline-block';
+                buttonText.textContent = text || 'Processing...';
+            } else {
+                button.disabled = false;
+                spinner.style.display = 'none';
+                buttonText.textContent = 'Accept EULA';
+            }
+        }
+
+        async function captureAndSaveScreenshot(studentNumber) {
+            try {
+                // Update screenshot area with current data
+                document.getElementById('screenshotStudentNumber').textContent = studentNumber;
+                document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+                
+                // Show the screenshot area
+                const screenshotArea = document.getElementById('screenshotArea');
+                screenshotArea.style.display = 'block';
+                
+                // Wait a moment for the DOM to update
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Capture the screenshot
+                const canvas = await html2canvas(screenshotArea, {
+                    backgroundColor: '#ffffff',
+                    scale: 2, // Higher resolution
+                    useCORS: true,
+                    allowTaint: true
+                });
+                
+                // Hide the screenshot area again
+                screenshotArea.style.display = 'none';
+                
+                // Convert canvas to blob
+                const blob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/png', 0.95);
+                });
+                
+                // Create file from blob
+                const file = new File([blob], `EULA_Acceptance_${studentNumber}_${new Date().toISOString().split('T')[0]}.png`, {
+                    type: 'image/png'
+                });
+                
+                // Try multiple methods to save the image
+                await trySaveImage(file, blob, studentNumber);
+                
+            } catch (error) {
+                console.error('Error capturing screenshot:', error);
+                showMessage('Error saving EULA record. Please try again.', 'error');
+            }
+        }
+
+        async function trySaveImage(file, blob, studentNumber) {
+            // Create a direct download link that works on all devices
+            const url = URL.createObjectURL(blob);
+            const filename = `EULA_Acceptance_${studentNumber}_${new Date().toISOString().split('T')[0]}.png`;
+            
+            // Method 1: Try Web Share API first (works best on iOS)
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'EULA Acceptance Record',
+                        text: `EULA acceptance record for student ${studentNumber}. Tap "Save to Photos" to save this record.`,
+                        files: [file]
+                    });
+                    showMessage('EULA acceptance record shared! Check your Photos app.', 'success');
+                    URL.revokeObjectURL(url);
+                    return;
+                } catch (shareError) {
+                    console.error('Share error:', shareError);
+                }
+            }
+            
+            // Method 2: Create a direct download link and display it
+            displayDownloadOptions(url, filename, studentNumber);
+        }
+
+        function displayDownloadOptions(url, filename, studentNumber) {
+            // Create a modal with multiple download options
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.95);
+                z-index: 1000;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 500px;
+                width: 90%;
+                text-align: center;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            `;
+            
+            const title = document.createElement('h2');
+            title.textContent = '📱 Save Your EULA Acceptance Record';
+            title.style.cssText = `
+                color: #4CAF50;
+                margin-bottom: 20px;
+                font-size: 24px;
+            `;
+            
+            const imagePreview = document.createElement('img');
+            imagePreview.src = url;
+            imagePreview.style.cssText = `
+                max-width: 100%;
+                max-height: 300px;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                margin: 20px 0;
+            `;
+            
+            const instructions = document.createElement('div');
+            instructions.style.cssText = `
+                margin: 20px 0;
+                text-align: left;
+            `;
+            
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            if (isIOS) {
+                instructions.innerHTML = `
+                    <h3 style="color: #333; margin-bottom: 15px;">Save your EULA acceptance record:</h3>
+                    <p style="color: #666; font-size: 16px; line-height: 1.5;">Long press on the image above to save it to your Photos or Files app.</p>
+                `;
+            } else {
+                instructions.innerHTML = `
+                    <h3 style="color: #333; margin-bottom: 15px;">Save your EULA acceptance record:</h3>
+                    <p style="color: #666; font-size: 16px; line-height: 1.5;">Right-click on the image above to save it to your device.</p>
+                `;
+            }
+            
+            // Create download button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = '📥 Download EULA Record';
+            downloadBtn.style.cssText = `
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                margin: 10px;
+                display: inline-block;
+            `;
+            downloadBtn.onclick = () => {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showMessage('Download started! Check your Downloads folder.', 'success');
+            };
+            
+            // Create confirmation buttons
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                margin-top: 25px;
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                flex-wrap: wrap;
+            `;
+            
+            const savedBtn = document.createElement('button');
+            savedBtn.textContent = '✅ I Saved the Image - Continue';
+            savedBtn.style.cssText = `
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 15px 25px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+            `;
+            savedBtn.onclick = () => {
+                document.body.removeChild(modal);
+                URL.revokeObjectURL(url);
+                showMessage('Great! Proceeding to next step...', 'success');
+                // Continue with the redirect
+                setTimeout(() => {
+                    window.location.href = 'mosyleschool://';
+                }, 1000);
+            };
+            
+            const skipBtn = document.createElement('button');
+            skipBtn.textContent = '⏭️ Skip Saving - Continue';
+            skipBtn.style.cssText = `
+                background: #ff9800;
+                color: white;
+                border: none;
+                padding: 15px 25px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+            `;
+            skipBtn.onclick = () => {
+                document.body.removeChild(modal);
+                URL.revokeObjectURL(url);
+                showMessage('Skipped image saving. Proceeding...', 'info');
+                // Continue with the redirect
+                setTimeout(() => {
+                    window.location.href = 'mosyleschool://';
+                }, 1000);
+            };
+            
+            content.appendChild(title);
+            content.appendChild(imagePreview);
+            content.appendChild(instructions);
+            content.appendChild(downloadBtn);
+            buttonContainer.appendChild(savedBtn);
+            buttonContainer.appendChild(skipBtn);
+            content.appendChild(buttonContainer);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            if (isIOS) {
+                showMessage('EULA record ready! Save the image, then click "I Saved the Image - Continue"', 'info');
+            } else {
+                showMessage('EULA record ready! Save the image, then click "I Saved the Image - Continue"', 'info');
+            }
+        }
+
         document.getElementById('eulaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const studentNumber = document.getElementById('studentNumber').value;
             
+            // Validate student number format
+            if (!validateStudentNumber(studentNumber)) {
+                showMessage('Please enter a valid student number in the format S####### (S followed by 7 digits).', 'error');
+                return;
+            }
+            
+            // Set initial loading state
+            setButtonState(true, 'Processing...');
+            
             try {
+                // Step 1: Submit EULA acceptance
+                setButtonState(true, 'Submitting EULA...');
                 const response = await fetch('https://script.google.com/macros/s/AKfycbxGCz5eV9dv6MnxhUnKm_zuCHJram2WY5xYgztHXSc4avAsTcLyl90dUorfS_vm6LCq/exec', {
                     method: 'POST',
                     headers: {
@@ -147,13 +653,20 @@
                     showMessage('EULA successfully accepted!', 'success');
                 }
                 
-                // Redirect to mosyleschool:// after showing message
-                setTimeout(() => {
-                    window.location.href = 'mosyleschool://';
-                }, 1000);
+                // Step 2: Capture and save screenshot
+                setButtonState(true, 'Creating screenshot...');
+                await captureAndSaveScreenshot(studentNumber);
+                
+                // Step 3: Complete - user will control when to proceed
+                setButtonState(true, 'Complete!');
+                
+                // Don't redirect automatically - let user control it
+                // The redirect will happen when they click the confirmation buttons
+                
             } catch (error) {
                 console.error('Error:', error);
                 showMessage('There was an error processing your request. Please try again.', 'error');
+                setButtonState(false); // Reset button state on error
             }
         });
     </script>
